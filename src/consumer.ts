@@ -1,5 +1,6 @@
-import {Kafka, logLevel, Partitioners} from 'kafkajs'
-import {Task} from './task'
+import {Kafka, logLevel, Partitioners} from 'kafkajs';
+import {Task} from './task';
+
 const kafka = new Kafka({
 	clientId: 'task-consumer',
 	brokers: ['localhost:9092'],
@@ -19,7 +20,6 @@ async function processTask(task: Task): Promise<boolean> {
 async function run() {
   await consumer.connect();
   await producer.connect();
-
   await consumer.subscribe({ topic: 'tasks', fromBeginning: true });
 
   await consumer.run({
@@ -33,15 +33,20 @@ async function run() {
       } else {
         // If task fails, increment retry count
         task.retryCount = (task.retryCount || 0) + 1;
+
         if (task.retryCount <= MAX_RETRIES) {
           // Calculate exponential backoff delay (in ms)
           const delay = Math.pow(2, task.retryCount) * 1000;
           console.log(`Task ${task.id} failed. Retrying in ${delay} ms`);
+        
           // Simple delay (in a real system, you might use a scheduling service)
           setTimeout(async () => {
             await producer.send({
               topic: 'tasks',
-              messages: [{ key: task.priority.toString(), value: JSON.stringify(task) }]
+              messages: [{ 
+                key: task.priority.toString(), 
+                value: JSON.stringify(task) 
+              }]
             });
             console.log(`Requeued task ${task.id} for retry ${task.retryCount}`);
           }, delay);

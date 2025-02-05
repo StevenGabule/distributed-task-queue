@@ -1,8 +1,6 @@
-// Build the Producer Service
-// Produce tasks to a Kafka topic named "tasks".
 import { Kafka, logLevel, Partitioners } from 'kafkajs';
-import {v4 as uuidv4} from 'uuid';
-import {Task} from './task'
+import { v4 as uuidv4 } from 'uuid';
+import { Task } from './task'
 
 // Configure KafkaJS client
 const kafka = new Kafka({
@@ -32,10 +30,13 @@ async function run() {
 	await producer.connect();
 
 	// Simulate creating tasks
-	for(let i = 1; i <= 10; i++) {
+	for (let i = 1; i <= 10; i++) {
 		const task: Task = {
 			id: uuidv4(),
-			payload: { orderId: `order-${i}`, details: `Process order ${i}`},
+			payload: { 
+				orderId: `order-${i}`, 
+				details: `Process order ${i}` 
+			},
 			priority: Math.floor(Math.random() * 10), // random priority
 			retryCount: 0
 		};
